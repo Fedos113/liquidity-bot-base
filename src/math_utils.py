@@ -2,7 +2,7 @@ import math
 import logging
 from typing import Tuple
 
-from src.constants import Q96, TICK_SPACINGS
+from src.constants import Q96
 
 logger = logging.getLogger("liqbot")
 
@@ -29,17 +29,10 @@ def price_to_tick(price: float, token0_decimals: int, token1_decimals: int, tick
 
 
 def get_tick_spacing(pool_contract) -> int:
-    try:
-        fee = pool_contract.functions.fee().call()
-        return TICK_SPACINGS.get(fee, 60)
-    except Exception:
-        try:
-            return pool_contract.functions.tickSpacing().call()
-        except Exception:
-            return 60
+    return pool_contract.functions.tickSpacing().call()
 
 
-def get_token_order(pool_contract, native_address: str) -> Tuple[bool, int, int]:
+def get_token_order(pool_contract, native_address: str) -> Tuple[bool, int, int, str, str]:
     token0 = pool_contract.functions.token0().call()
     token1 = pool_contract.functions.token1().call()
     token0_addr = token0.lower()
@@ -53,7 +46,7 @@ def get_token_order(pool_contract, native_address: str) -> Tuple[bool, int, int]
     from src.config import config
     decimals0 = config.NATIVE_DECIMALS if token0_is_native else config.USDC_DECIMALS
     decimals1 = config.NATIVE_DECIMALS if not token0_is_native else config.USDC_DECIMALS
-    return token0_is_native, decimals0, decimals1
+    return token0_is_native, decimals0, decimals1, token0, token1
 
 
 def calculate_bounds(

@@ -89,7 +89,7 @@ def _secondary_cycle():
 
             if pos and pos["liquidity"] > 0:
                 current_price, current_tick, _ = get_current_price(w3, pool)
-                token0_is_hype, dec0, dec1 = get_token_order(pool, config.WETH_ADDRESS)
+                token0_is_hype, dec0, dec1, _, _ = get_token_order(pool, config.WETH_ADDRESS)
                 invert = not token0_is_hype
                 lower_price = tick_to_price(pos["tickLower"], dec0, dec1, invert)
                 trigger_price = lower_price * config.DROP_THRESHOLD
@@ -114,14 +114,14 @@ def _secondary_cycle():
 
                             weth_bal, usdc_bal = get_token_balances(w3)
                             if weth_bal > 0:
-                                pool_fee = pool.functions.fee().call()
+                                pool_ts = pool.functions.tickSpacing().call()
                                 approve_token(
                                     w3, get_native_or_usdc(w3, True),
                                     config.SWAP_ROUTER_ADDRESS, weth_bal, config.DRY_RUN,
                                 )
                                 swap_exact_input_single(
                                     w3, config.WETH_ADDRESS, config.USDC_ADDRESS,
-                                    pool_fee, weth_bal, config.DRY_RUN,
+                                    pool_ts, weth_bal, config.DRY_RUN,
                                 )
                                 logger.info("[SECONDARY] Position closed, all WETH swapped to USDC")
                         except TxFeeExceeded as e:
@@ -195,7 +195,7 @@ def run_bot():
             logger.info(f"Current price: {current_price:.6f} USDC/WETH")
             logger.info(f"Current tick: {current_tick}")
 
-            token0_is_hype, dec0, dec1 = get_token_order(pool, config.WETH_ADDRESS)
+            token0_is_hype, dec0, dec1, _, _ = get_token_order(pool, config.WETH_ADDRESS)
             tick_spacing = get_tick_spacing(pool)
             invert = not token0_is_hype
 
