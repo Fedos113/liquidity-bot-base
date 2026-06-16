@@ -151,11 +151,11 @@ def get_unclaimed_fees(w3: Web3, pool, pos: dict) -> tuple:
         return fee_growth_global - below - above
 
     current_inside_0 = fee_growth_inside(
-        fee_growth_global_0, lower_tick[2], upper_tick[2],
+        fee_growth_global_0, lower_tick[3], upper_tick[3],
         tick_lower, tick_upper, current_tick,
     )
     current_inside_1 = fee_growth_inside(
-        fee_growth_global_1, lower_tick[3], upper_tick[3],
+        fee_growth_global_1, lower_tick[4], upper_tick[4],
         tick_lower, tick_upper, current_tick,
     )
 
